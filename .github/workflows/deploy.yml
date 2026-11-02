@@ -27,6 +27,9 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
+      - name: Configure Web Platform
+        run: flutter create . --platforms web
+
       - name: Build Web Application
         run: flutter build web --base-href "${{ steps.pages.outputs.base_path }}/" --release
 
