@@ -1,5 +1,26 @@
 import 'package:flutter/material.dart';
-import 'vienna_task_detail.dart'; // Импортируем второй экран
+import 'vienna_task_detail.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        fontFamily: 'Roboto',
+        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
+        useMaterial3: true,
+      ),
+      home: const CleaningScheduleScreen(),
+    );
+  }
+}
 
 class CleaningScheduleScreen extends StatefulWidget {
   const CleaningScheduleScreen({super.key});
@@ -20,7 +41,6 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Header (Greeting)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -29,24 +49,29 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                     children: const [
                       Text(
                         'Anna, good day',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
                       ),
                       SizedBox(height: 4),
                       Text(
                         'Monday, November 2, 2026',
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
                   const CircleAvatar(
                     backgroundColor: Colors.grey,
-                    child: Text('AC', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+                    child: Text('AN', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
-
-              // 2. Current Cleaning Banner
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16.0),
@@ -91,7 +116,6 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                         elevation: 0,
                       ),
                       onPressed: () {
-                        // Переход на экран деталей по кнопке "Открыть уборку"
                         Navigator.push(
                           context,
                           MaterialPageRoute(builder: (context) => const TaskDetailScreen()),
@@ -104,13 +128,11 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              // 3. List Title
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
                   Text(
-                    'Cleaning schedule',
+                    'Cleaning Schedule',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                   Text(
@@ -120,8 +142,6 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-
-              // 4. Card 1: Completed
               _buildJobCard(
                 context: context,
                 time: '09:00–11:00 · 2 h',
@@ -129,7 +149,7 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                 group: 'District "Zentrum"',
                 statusWidget: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: const Color(0xFFF1F3F4), borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: Colors.black12, borderRadius: BorderRadius.circular(8)),
                   child: Row(
                     children: const [
                       Icon(Icons.check, size: 14, color: Colors.grey),
@@ -139,8 +159,6 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                   ),
                 ),
               ),
-
-              // 5. Card 2: In Progress
               _buildJobCard(
                 context: context,
                 time: '11:30–13:30 · 2 h',
@@ -155,8 +173,6 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                   ],
                 ),
               ),
-
-              // 6. Card 3: Scheduled
               _buildJobCard(
                 context: context,
                 time: '14:00–16:00 · 2 h',
@@ -164,7 +180,7 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                 group: 'District "Nord"',
                 statusWidget: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: const Color(0xFFF1F3F4), borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: Colors.black12, borderRadius: BorderRadius.circular(8)),
                   child: Row(
                     children: const [
                       Icon(Icons.access_time, size: 14, color: Colors.grey),
@@ -178,7 +194,12 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                   children: [
                     const Text('On schedule · 2 h', style: TextStyle(color: Colors.grey, fontSize: 13)),
                     TextButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const TaskDetailScreen()),
+                        );
+                      },
                       icon: const Icon(Icons.play_arrow_outlined, size: 18),
                       label: const Text('On schedule'),
                       style: TextButton.styleFrom(foregroundColor: const Color(0xFF0D47A1)),
@@ -186,8 +207,6 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                   ],
                 ),
               ),
-
-              // 7. Sync Badge
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Center(
@@ -196,7 +215,10 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                     children: const [
                       Icon(Icons.sync, size: 14, color: Colors.grey),
                       SizedBox(width: 4),
-                      Text('Synced at 12:30 PM', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(
+                        'Synced at 12:30 PM',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
                     ],
                   ),
                 ),
@@ -211,6 +233,8 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF0D47A1),
         unselectedItemColor: Colors.grey,
+        selectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        unselectedLabelStyle: const TextStyle(fontSize: 12),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_month_outlined), activeIcon: Icon(Icons.calendar_month), label: 'Schedule'),
@@ -248,50 +272,58 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
         color: isCurrent ? const Color(0xFFEEF2FA) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: isCurrent ? Border.all(color: const Color(0xFF0D47A1).withOpacity(0.3), width: 1) : null,
+        boxShadow: !isCurrent
+            ? [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 2))]
+            : null,
       ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          // Реализация перехода на второй экран при клике на любую карточку
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const TaskDetailScreen()),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(time, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-                  statusWidget,
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(address, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
-                        const SizedBox(height: 4),
-                        Text(group, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-                      ],
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const TaskDetailScreen()),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(time, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                    statusWidget,
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            address,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(group, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                        ],
+                      ),
                     ),
-                  ),
-                  const Icon(Icons.chevron_right, color: Colors.grey),
-                ],
-              ),
-              if (bottomAction != null) ...[
-                const Divider(height: 24, thickness: 0.5),
-                bottomAction,
-              ]
-            ],
+                    const Icon(Icons.chevron_right, color: Colors.grey),
+                  ],
+                ),
+                if (bottomAction != null) ...[
+                  const Divider(height: 24, thickness: 0.5),
+                  bottomAction,
+                ]
+              ],
+            ),
           ),
         ),
       ),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-// Обязательно проверьте имя файла расписания в вашей папке lib/ 
-// Оно должно в точности совпадать с именем в импорте ниже:
-import 'vienna_schedule_screen.dart'; 
+import 'vienna_schedule_screen.dart'; // Импорт первого экрана
 
 void main() {
   runApp(const MyApp());
@@ -17,11 +15,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Roboto',
         scaffoldBackgroundColor: const Color(0xFFF8F9FA),
-        // Включаем поддержку Material-иконок на уровне темы приложения
-        useMaterial3: true, 
+        useMaterial3: true, // Важно для корректного отображения Material-иконок
       ),
-      // Указываем первый экран приложения в качестве домашнего
-      home: const CleaningScheduleScreen(), 
+      home: const CleaningScheduleScreen(), // Запуск главного экрана расписания
     );
   }
 }

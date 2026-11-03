@@ -27,7 +27,6 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () {
-            // Реализация возврата на первый экран
             Navigator.pop(context);
           },
         ),
@@ -39,12 +38,18 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           Container(
             margin: const EdgeInsets.only(right: 16, top: 12, bottom: 12),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(color: const Color(0xFFEEF2FA), borderRadius: BorderRadius.circular(8)),
+            decoration: BoxDecoration(
+              color: const Color(0xFFEEF2FA),
+              borderRadius: BorderRadius.circular(8),
+            ),
             child: Row(
               children: const [
                 Icon(Icons.pause, size: 14, color: Color(0xFF0D47A1)),
                 SizedBox(width: 4),
-                Text('In progress', style: TextStyle(color: Color(0xFF0D47A1), fontSize: 12, fontWeight: FontWeight.w500)),
+                Text(
+                  'In progress',
+                  style: TextStyle(color: Color(0xFF0D47A1), fontSize: 12, fontWeight: FontWeight.w500),
+                ),
               ],
             ),
           ),
@@ -59,7 +64,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('November 2, 2026 · Regular cleaning', style: TextStyle(color: Colors.grey, fontSize: 14)),
+                    const Text(
+                      'November 2, 2026 · Regular cleaning',
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
                     const SizedBox(height: 12),
                     const Text(
                       'Apartment Praterstraße 23,\nApt. 8',
@@ -78,25 +86,41 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     const SizedBox(height: 24),
                     Container(
                       padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: const Color(0xFFF8F9FA), borderRadius: BorderRadius.circular(16)),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8F9FA),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                       child: Row(
                         children: [
-                          const CircleAvatar(
-                            backgroundColor: Colors.grey,
-                            child: Icon(Icons.location_on_outlined, color: Colors.black54),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: const BoxDecoration(
+                              color: Colors.black12,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.location_on_outlined, color: Colors.grey),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: const [
-                                Text('Praterstraße 23, Apt. 8', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black87)),
+                                Text(
+                                  'Praterstraße 23, Apt. 8',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black87),
+                                ),
                                 SizedBox(height: 4),
-                                Text('2nd floor · courtyard entrance', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                                Text(
+                                  '2nd floor · courtyard entrance',
+                                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                                ),
                               ],
                             ),
                           ),
-                          IconButton(icon: const Icon(Icons.near_me_outlined, color: Color(0xFF0D47A1)), onPressed: () {}),
+                          IconButton(
+                            icon: const Icon(Icons.near_me_outlined, color: Color(0xFF0D47A1)),
+                            onPressed: () {},
+                          ),
                         ],
                       ),
                     ),
@@ -104,12 +128,25 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Cleaning checklist', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
-                        Text('$completedCount of ${_checklist.length}', style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                        const Text(
+                          'Cleaning checklist',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                        ),
+                        Text(
+                          '$completedCount of ${_checklist.length}',
+                          style: TextStyle(color: Colors.grey, fontSize: 14),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Container(width: 140, height: 3, decoration: BoxDecoration(color: const Color(0xFF0D47A1), borderRadius: BorderRadius.circular(2))),
+                    Container(
+                      width: 140,
+                      height: 3,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0D47A1),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     ListView.separated(
                       shrinkWrap: true,
@@ -123,6 +160,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                           leading: Checkbox(
                             value: item['isChecked'],
                             activeColor: const Color(0xFF0D47A1),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                             onChanged: (bool? value) {
                               setState(() {
                                 _checklist[index]['isChecked'] = value;
@@ -154,6 +192,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 54),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
                     ),
                     onPressed: () {},
                     icon: const Icon(Icons.play_arrow_outlined),
