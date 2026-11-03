@@ -5,20 +5,30 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFFAFAFA)),
-      home: const MainScheduleScreen(),
+      theme: ThemeData(
+        fontFamily: 'Roboto',
+        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
+      ),
+      home: const CleaningScheduleScreen(),
     );
   }
 }
 
-class MainScheduleScreen extends StatelessWidget {
-  const MainScheduleScreen({Key? key}) : super(key: key);
+class CleaningScheduleScreen extends StatefulWidget {
+  const CleaningScheduleScreen({super.key});
+
+  @override
+  State<CleaningScheduleScreen> createState() => _CleaningScheduleScreenState();
+}
+
+class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -29,471 +39,280 @@ class MainScheduleScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Верхняя панель: Название компании и аватар
+              // 1. Header (Greeting)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: const [
-                      Icon(
-                        Icons.clean_hands_outlined,
-                        color: Color(0xFF1E52E8),
-                        size: 20,
-                      ),
-                      SizedBox(width: 6),
-                      Text(
-                        'чисто / команда',
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Anna, good day',
                         style: TextStyle(
-                          color: Color(0xFF1E52E8),
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Monday, November 2, 2026',
+                        style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
                         ),
                       ),
                     ],
                   ),
                   CircleAvatar(
-                    radius: 18,
-                    backgroundColor: const Color(0xFFEEEEEE),
-                    child: const Text(
-                      'AC',
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    backgroundColor: Colors.grey[300],
+                    child: const Text('AS', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-
-              // 2. Приветствие и текущая дата
-              const Text(
-                'Анна, добрый день',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Понедельник, 2 ноября 2026',
-                style: TextStyle(color: Colors.black38, fontSize: 13),
-              ),
               const SizedBox(height: 20),
 
-              // 3. Синий баннер "Текущая уборка"
+              // 2. Current Cleaning Banner
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E52E8),
-                  borderRadius: BorderRadius.circular(20),
+                  color: const Color(0xFF0D47A1),
+                  borderRadius: BorderRadius.circular(24.0),
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text(
-                          'Текущая уборка',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          'Current cleaning',
+                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                         ),
                         Row(
                           children: const [
-                            Icon(Icons.pause, color: Colors.white70, size: 14),
+                            Icon(Icons.pause, color: Colors.white, size: 16),
                             SizedBox(width: 4),
-                            Text(
-                              'В работе',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
+                            Text('In progress', style: TextStyle(color: Colors.white, fontSize: 14)),
                           ],
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Начало уборки',
-                              style: TextStyle(
-                                color: Colors.white60,
-                                fontSize: 11,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              '11:30',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'План уборки',
-                              style: TextStyle(
-                                color: Colors.white60,
-                                fontSize: 11,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              '2 часа',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              'Выполнено',
-                              style: TextStyle(
-                                color: Colors.white60,
-                                fontSize: 11,
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              '1 из 3',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
+                        _buildInfoColumn('Start time', '11:30'),
+                        _buildInfoColumn('Estimated time', '2 hours'),
+                        _buildInfoColumn('Completed', '1 of 3'),
                       ],
                     ),
                     const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 46,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF1E52E8),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.play_arrow_outlined, size: 20),
-                            SizedBox(width: 6),
-                            Text(
-                              'Открыть уборку',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFF0D47A1),
+                        minimumSize: const Size(double.infinity, 48),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        elevation: 0,
                       ),
+                      onPressed: () {},
+                      icon: const Icon(Icons.play_arrow_outlined),
+                      label: const Text('Open cleaning job', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
 
-              // 4. Заголовок секции "График уборок"
+              // 3. Schedule Title
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'График уборок',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                children: [
+                  const Text(
+                    'Cleaning Schedule',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                   Text(
-                    '3 квартиры',
-                    style: TextStyle(color: Colors.black38, fontSize: 13),
+                    '3 apartments',
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
 
-              // 5. Карточки объектов из расписания
-              CleaningCard(
-                time: '09:00–11:00 · 2 ч',
-                address: 'Квартира ул. Мира, 24, кв. 18',
-                group: 'Группа «Центр»',
-                statusText: 'Фото отправлены',
-                statusColor: Colors.grey.shade500,
-                statusIcon: Icons.check,
-                isAccentStatus: false,
-              ),
-              CleaningCard(
-                time: '11:30–13:30 · 2 ч',
-                address: 'Квартира ул. Лесная, 7, кв. 42',
-                group: 'Группа «Центр»',
-                statusText: 'В работе',
-                statusColor: const Color(0xFF1E52E8),
-                statusIcon: Icons.pause,
-                isAccentStatus: true,
-              ),
-
-              // Особая нижняя карточка с разделителем и кнопкой действия
-              Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFEEF0F2)),
+              // 4. Card 1: Completed (Photos sent)
+              _buildJobCard(
+                time: '09:00–11:00 · 2 h',
+                address: 'Apartment Mariahilfer Str. 45, Apt. 12',
+                group: 'District "Zentrum"',
+                statusWidget: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    children: const [
+                      Icon(Icons.check, size: 14, color: Colors.green),
+                      SizedBox(width: 4),
+                      Text('Photos sent', style: TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+
+              // 5. Card 2: Current (In progress)
+              _buildJobCard(
+                time: '11:30–13:30 · 2 h',
+                address: 'Apartment Praterstraße 23, Apt. 8',
+                group: 'District "Zentrum"',
+                isCurrent: true,
+                statusWidget: Row(
+                  children: const [
+                    Icon(Icons.pause, size: 14, color: Color(0xFF0D47A1)),
+                    SizedBox(width: 4),
+                    Text('In progress', style: TextStyle(fontSize: 12, color: Color(0xFF0D47A1), fontWeight: FontWeight.w500)),
+                  ],
+                ),
+              ),
+
+              // 6. Card 3: Scheduled
+              _buildJobCard(
+                time: '14:00–16:00 · 2 h',
+                address: 'Apartment Schönbrunner Str. 112, Apt. 4',
+                group: 'District "Nord"',
+                statusWidget: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    children: [
+                      Icon(Icons.access_time, size: 14, color: Colors.grey[700]),
+                      const SizedBox(width: 4),
+                      Text('Scheduled', style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+                    ],
+                  ),
+                ),
+                bottomAction: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          '14:00–16:00 · 2 ч',
-                          style: TextStyle(color: Colors.black54, fontSize: 13),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F5F5),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            children: const [
-                              Icon(
-                                Icons.access_time,
-                                color: Colors.black45,
-                                size: 13,
-                              ),
-                              SizedBox(width: 4),
-                              Text(
-                                'Запланирована',
-                                style: TextStyle(
-                                  color: Colors.black45,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: const [
-                        Expanded(
-                          child: Text(
-                            'Квартира ул. Садовая, 12, кв. 7',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1A1A1A),
-                            ),
-                          ),
-                        ),
-                        Icon(Icons.chevron_right, color: Colors.black26),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      'Группа «Север»',
-                      style: TextStyle(color: Colors.black38, fontSize: 12),
-                    ),
-                    const SizedBox(height: 12),
-                    const Divider(height: 1, color: Color(0xFFEEF0F2)),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'По плану · 2 ч',
-                          style: TextStyle(color: Colors.black45, fontSize: 13),
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(
-                            foregroundColor: const Color(0xFF1E52E8),
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Row(
-                            children: const [
-                              Icon(Icons.play_arrow_outlined, size: 16),
-                              SizedBox(width: 2),
-                              Text(
-                                'По расписанию',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                    Text('On schedule · 2 h', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                    TextButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.play_arrow_outlined, size: 18),
+                      label: const Text('Start on time'),
+                      style: TextButton.styleFrom(foregroundColor: const Color(0xFF0D47A1)),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              // 6. Индикатор последней синхронизации данных
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(Icons.sync, color: Colors.black26, size: 14),
-                  SizedBox(width: 4),
-                  Text(
-                    'Синхронизация в 12:30',
-                    style: TextStyle(color: Colors.black26, fontSize: 12),
+
+              // 7. Sync Label
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.sync, size: 14, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Synced at 12:30 PM',
+                        style: TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
-      // Навигационное меню (Bottom Bar)
+      
+      // 8. Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
-        elevation: 1,
-        backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF1E52E8),
-        unselectedItemColor: Colors.black26,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFF0D47A1),
+        unselectedItemColor: Colors.grey,
+        selectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        unselectedLabelStyle: const TextStyle(fontSize: 12),
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today_outlined),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.description_outlined),
-            label: '',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_month_outlined), activeIcon: Icon(Icons.calendar_month), label: 'Schedule'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: 'Chat'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
   }
-}
 
-class CleaningCard extends StatelessWidget {
-  final String time;
-  final String address;
-  final String group;
-  final String statusText;
-  final Color statusColor;
-  final IconData statusIcon;
-  final bool isAccentStatus;
-  const CleaningCard({
-    Key? key,
-    required this.time,
-    required this.address,
-    required this.group,
-    required this.statusText,
-    required this.statusColor,
-    required this.statusIcon,
-    required this.isAccentStatus,
-  }) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildInfoColumn(String title, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
+  Widget _buildJobCard({
+    required String time,
+    required String address,
+    required String group,
+    required Widget statusWidget,
+    bool isCurrent = false,
+    Widget? bottomAction,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isCurrent ? const Color(0xFFEEF2FA) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFEEF0F2)),
+        border: isCurrent ? Border.all(color: const Color(0xFF0D47A1).withOpacity(0.3), width: 1) : null,
+        boxShadow: !isCurrent
+            ? [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 2))]
+            : null,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                time,
-                style: const TextStyle(color: Colors.black54, fontSize: 13),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isAccentStatus
-                      ? statusColor.withOpacity(0.08)
-                      : const Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
-                  children: [
-                    Icon(statusIcon, color: statusColor, size: 13),
-                    const SizedBox(width: 4),
-                    Text(
-                      statusText,
-                      style: TextStyle(
-                        color: statusColor,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(time, style: TextStyle(color: Colors.grey, fontSize: 13)),
+                statusWidget,
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        address,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  address,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1A1A1A),
+                      const SizedBox(height: 4),
+                      Text(group, style: TextStyle(color: Colors.grey, fontSize: 13)),
+                    ],
                   ),
                 ),
-              ),
-              const Icon(Icons.chevron_right, color: Colors.black26),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            group,
-            style: const TextStyle(color: Colors.black38, fontSize: 12),
-          ),
-        ],
+                Icon(Icons.chevron_right, color: Colors.grey),
+              ],
+            ),
+            if (bottomAction != null) ...[
+              const Divider(height: 24, thickness: 0.5),
+              bottomAction,
+            ]
+          ],
+        ),
       ),
     );
   }
