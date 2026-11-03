@@ -229,7 +229,15 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          setState(() => _currentIndex = index);
+          if (index == 3) { // Если нажали на вкладку Отчёты
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const ReportsScreen()),
+            );
+          }
+        },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF0D47A1),
         unselectedItemColor: Colors.grey,
