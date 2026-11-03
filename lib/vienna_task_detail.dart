@@ -210,7 +210,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const PhotoReportScreen()),
+                        MaterialPageRoute(builder: (context) => PhotoReportScreen()),
                       );
                     },
                     icon: const Icon(Icons.check_box_outlined, size: 20),
