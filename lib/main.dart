@@ -1,24 +1,5 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Roboto',
-        scaffoldBackgroundColor: const Color(0xFFF8F9FA),
-      ),
-      home: const CleaningScheduleScreen(),
-    );
-  }
-}
+import 'vienna_task_detail.dart'; // Импортируем второй экран
 
 class CleaningScheduleScreen extends StatefulWidget {
   const CleaningScheduleScreen({super.key});
@@ -45,28 +26,21 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
+                    children: const [
+                      Text(
                         'Anna, good day',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text(
                         'Monday, November 2, 2026',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                     ],
                   ),
-                  CircleAvatar(
-                    backgroundColor: Colors.grey[300],
-                    child: const Text('AS', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+                  const CircleAvatar(
+                    backgroundColor: Colors.grey,
+                    child: Text('AC', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -102,8 +76,8 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildInfoColumn('Start time', '11:30'),
-                        _buildInfoColumn('Estimated time', '2 hours'),
+                        _buildInfoColumn('Start time', '11:30 AM'),
+                        _buildInfoColumn('Schedule', '2 hours'),
                         _buildInfoColumn('Completed', '1 of 3'),
                       ],
                     ),
@@ -116,21 +90,27 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         elevation: 0,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        // Переход на экран деталей по кнопке "Открыть уборку"
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const TaskDetailScreen()),
+                        );
+                      },
                       icon: const Icon(Icons.play_arrow_outlined),
-                      label: const Text('Open cleaning job', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      label: const Text('Open cleaning', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 24),
 
-              // 3. Schedule Title
+              // 3. List Title
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Cleaning Schedule',
+                children: const [
+                  Text(
+                    'Cleaning schedule',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
                   Text(
@@ -141,26 +121,28 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
               ),
               const SizedBox(height: 16),
 
-              // 4. Card 1: Completed (Photos sent)
+              // 4. Card 1: Completed
               _buildJobCard(
+                context: context,
                 time: '09:00–11:00 · 2 h',
                 address: 'Apartment Mariahilfer Str. 45, Apt. 12',
                 group: 'District "Zentrum"',
                 statusWidget: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: Colors.green.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: const Color(0xFFF1F3F4), borderRadius: BorderRadius.circular(8)),
                   child: Row(
                     children: const [
-                      Icon(Icons.check, size: 14, color: Colors.green),
+                      Icon(Icons.check, size: 14, color: Colors.grey),
                       SizedBox(width: 4),
-                      Text('Photos sent', style: TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.w500)),
+                      Text('Photos sent', style: TextStyle(fontSize: 12, color: Colors.grey)),
                     ],
                   ),
                 ),
               ),
 
-              // 5. Card 2: Current (In progress)
+              // 5. Card 2: In Progress
               _buildJobCard(
+                context: context,
                 time: '11:30–13:30 · 2 h',
                 address: 'Apartment Praterstraße 23, Apt. 8',
                 group: 'District "Zentrum"',
@@ -176,47 +158,45 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
 
               // 6. Card 3: Scheduled
               _buildJobCard(
+                context: context,
                 time: '14:00–16:00 · 2 h',
                 address: 'Apartment Schönbrunner Str. 112, Apt. 4',
                 group: 'District "Nord"',
                 statusWidget: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)),
+                  decoration: BoxDecoration(color: const Color(0xFFF1F3F4), borderRadius: BorderRadius.circular(8)),
                   child: Row(
-                    children: [
-                      Icon(Icons.access_time, size: 14, color: Colors.grey[700]),
-                      const SizedBox(width: 4),
-                      Text('Scheduled', style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+                    children: const [
+                      Icon(Icons.access_time, size: 14, color: Colors.grey),
+                      SizedBox(width: 4),
+                      Text('Scheduled', style: TextStyle(fontSize: 12, color: Colors.grey)),
                     ],
                   ),
                 ),
                 bottomAction: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('On schedule · 2 h', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                    const Text('On schedule · 2 h', style: TextStyle(color: Colors.grey, fontSize: 13)),
                     TextButton.icon(
                       onPressed: () {},
                       icon: const Icon(Icons.play_arrow_outlined, size: 18),
-                      label: const Text('Start on time'),
+                      label: const Text('On schedule'),
                       style: TextButton.styleFrom(foregroundColor: const Color(0xFF0D47A1)),
                     ),
                   ],
                 ),
               ),
 
-              // 7. Sync Label
+              // 7. Sync Badge
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Center(
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: [
+                    children: const [
                       Icon(Icons.sync, size: 14, color: Colors.grey),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Synced at 12:30 PM',
-                        style: TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
+                      SizedBox(width: 4),
+                      Text('Synced at 12:30 PM', style: TextStyle(color: Colors.grey, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -225,16 +205,12 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
           ),
         ),
       ),
-      
-      // 8. Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF0D47A1),
         unselectedItemColor: Colors.grey,
-        selectedLabelStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-        unselectedLabelStyle: const TextStyle(fontSize: 12),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.calendar_month_outlined), activeIcon: Icon(Icons.calendar_month), label: 'Schedule'),
@@ -257,6 +233,7 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
   }
 
   Widget _buildJobCard({
+    required BuildContext context,
     required String time,
     required String address,
     required String group,
@@ -271,47 +248,51 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
         color: isCurrent ? const Color(0xFFEEF2FA) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: isCurrent ? Border.all(color: const Color(0xFF0D47A1).withOpacity(0.3), width: 1) : null,
-        boxShadow: !isCurrent
-            ? [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 2))]
-            : null,
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(time, style: TextStyle(color: Colors.grey, fontSize: 13)),
-                statusWidget,
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        address,
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(group, style: TextStyle(color: Colors.grey, fontSize: 13)),
-                    ],
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          // Реализация перехода на второй экран при клике на любую карточку
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const TaskDetailScreen()),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(time, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                  statusWidget,
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(address, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
+                        const SizedBox(height: 4),
+                        Text(group, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                      ],
+                    ),
                   ),
-                ),
-                Icon(Icons.chevron_right, color: Colors.grey),
-              ],
-            ),
-            if (bottomAction != null) ...[
-              const Divider(height: 24, thickness: 0.5),
-              bottomAction,
-            ]
-          ],
+                  const Icon(Icons.chevron_right, color: Colors.grey),
+                ],
+              ),
+              if (bottomAction != null) ...[
+                const Divider(height: 24, thickness: 0.5),
+                bottomAction,
+              ]
+            ],
+          ),
         ),
       ),
     );
