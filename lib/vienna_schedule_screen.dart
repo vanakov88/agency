@@ -49,7 +49,7 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
                       Text(
-                        'Anna, good day',
+                        'Svetlana, good day',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                   ),
                   const CircleAvatar(
                     backgroundColor: Colors.grey,
-                    child: Text('AN', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+                    child: Text('SV', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
