@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'vienna_task_detail.dart';
 import 'vienna_reports_screen.dart';
+import 'vienna_chat_screen.dart'
+import 'vienna_photo_report_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,7 +51,7 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: const [
                       Text(
-                        'Svetlana, good day',
+                        'Svetlana, hello',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -232,6 +234,12 @@ class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() => _currentIndex = index);
+          if (index == 2) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const ChatScreen()),
+            );
+          }
           if (index == 3) { // Если нажали на вкладку Отчёты
             Navigator.pushReplacement(
               context,

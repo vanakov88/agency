@@ -207,7 +207,12 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                       minimumSize: const Size(double.infinity, 54),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PhotoReportScreen()),
+                      );
+                    },
                     icon: const Icon(Icons.check_box_outlined, size: 20),
                     label: const Text('Finish cleaning', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
                   ),
