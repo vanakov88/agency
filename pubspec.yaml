@@ -12,3 +12,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+# Добавьте этот блок в самый конец файла:
+flutter:
+  uses-material-design: true
