@@ -22,90 +22,125 @@ class _ReportsScreenState extends State<ReportsScreen> {
     setState(() => _isGenerating = true);
 
     try {
-      // 1. Запрашиваем данные из живой базы PostgreSQL (Линейный срез за Ноябрь 2026)
+      // 1. Фильтруем данные строго по Анне Смирновой за Октябрь 2026 года
       final List<dynamic> tasks = await Supabase.instance.client
           .from('cleaningtasks')
           .select('status, scheduled_start, scheduled_duration, actual_start, actual_end, apartments(address, district)')
+          .eq('employee_id', '22222222-2222-2222-2222-222222222222') // ID Анны из сид-скрипта
+          .gte('scheduled_start', '2026-10-01 00:00:00+02')
+          .lt('scheduled_start', '2026-11-01 00:00:00+02')
           .order('scheduled_start', ascending: true);
 
-      // 2. Создаем виртуальный PDF документ
-      final pdf = pw.Document();
+      // 2. Рассчитываем суммарные показатели за месяц на клиенте
+      double totalPlannedHours = 0.0;
+      double totalActualHours = 0.0;
 
-      // 3. Формируем страницу отчета
+      for (var task in tasks) {
+        final int planMin = task['scheduled_duration'] ?? 0;
+        totalPlannedHours += planMin / 60.0;
+
+        if (task['actual_start'] != null && task['actual_end'] != null) {
+          final start = DateTime.parse(task['actual_start']);
+          final end = DateTime.parse(task['actual_end']);
+          totalActualHours += end.difference(start).inMinutes / 60.0;
+        }
+      }
+
+      // 3. Строим документ
+      final pdf = pw.Document();
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
           margin: const pw.EdgeInsets.all(32),
           build: (pw.Context context) {
             return [
-              // Шапка документа
-              pw.Text('CLEAN TEAM VIENNA · PERFORMANCE REPORT', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900)),
+              // Название компании и тип отчета
+              pw.Text('CLEAN TEAM VIENNA - EMPLOYEE REPORT', style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900)),
               pw.SizedBox(height: 4),
-              pw.Text('Monthly Summary Report · November 2026', style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700)),
-              pw.SizedBox(height: 20),
+              pw.Text('Monthly Performance & Hours Tracking - October 2026', style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700)),
+              pw.SizedBox(height: 16),
 
-              // Заголовок таблицы
-              pw.Text('Detailed Cleaning Log', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              // Карточка сотрудника с итогами (Total Hours Card)
+              pw.Container(
+                padding: const pw.EdgeInsets.all(12),
+                decoration: const pw.BoxDecoration(
+                  color: PdfColors.grey100,
+                  borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
+                ),
+                child: pw.Column(
+                  cross pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text('Employee: Anna Smirnova', style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
+                    pw.Text('Role: Cleaning Specialist (Personal Contract)', style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey800)),
+                    pw.SizedBox(height: 8),
+                    pw.Row(
+                      main pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Total Planned Hours: ${totalPlannedHours.toStringAsFixed(2)} h', style: const pw.TextStyle(fontSize: 12)),
+                        pw.Text('Total Actual Logged: ${totalActualHours.toStringAsFixed(2)} h', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900)),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              pw.SizedBox(height: 24),
+
+              pw.Text('Detailed Shift & Hours Log', style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 8),
 
-              // Строим таблицу данных
+              // Таблица почасовки за октябрь
               pw.TableHelper.fromTextArray(
-                headers: ['Date', 'District / Address', 'Plan (h)', 'Actual (h)', 'Status'],
+                headers: ['Date', 'District / Property Address', 'Plan (h)', 'Actual (h)', 'Status'],
                 data: tasks.map((task) {
                   final apt = task['apartments'] as Map<String, dynamic>? ?? {};
-                  final startStr = task['scheduled_start']?.toString().split('T').first ?? '';
+                  final dateStr = task['scheduled_start']?.toString().split('T').first ?? '';
                   
-                  // Расчет плановых часов
                   final int planMin = task['scheduled_duration'] ?? 0;
-                  final double planHours = planMin / 60.0;
+                  final double planH = planMin / 60.0;
 
-                  // Расчет фактических отработанных часов
-                  double actualHours = 0.0;
+                  double actualH = 0.0;
                   if (task['actual_start'] != null && task['actual_end'] != null) {
                     final start = DateTime.parse(task['actual_start']);
                     final end = DateTime.parse(task['actual_end']);
-                    actualHours = end.difference(start).inMinutes / 60.0;
+                    actualH = end.difference(start).inMinutes / 60.0;
                   }
 
                   return [
-                    startStr,
+                    dateStr,
                     '${apt['district'] ?? ''}\n${apt['address'] ?? ''}',
-                    planHours.toStringAsFixed(2),
-                    actualHours > 0 ? actualHours.toStringAsFixed(2) : '-',
+                    planH.toStringAsFixed(2),
+                    actualH > 0 ? actualH.toStringAsFixed(2) : '-',
                     task['status']?.toString().toUpperCase() ?? '',
                   ];
                 }).toList(),
-                border: pw.TableBorder.all(color: PdfColors.grey400, width: 0.5),
-                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+                border: pw.TableBorder.all(color: PdfColors.grey300, width: 0.5),
+                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white, fontSize: 11),
                 headerDecoration: const pw.BoxDecoration(color: PdfColors.blue900),
+                cellStyle: const pw.TextStyle(fontSize: 10),
                 cellAlignment: pw.Alignment.centerLeft,
-                cellPadding: const pw.EdgeInsets.all(6),
+                cellPadding: const pw.EdgeInsets.all(5),
               ),
             ];
           },
         ),
       );
 
-      // 4. Конвертируем документ в байты для сохранения в браузере
+      // Скачивание файла в браузере
       final bytes = await pdf.save();
       final blob = html.Blob([bytes], 'application/pdf');
       final url = html.Url.createObjectUrlFromBlob(blob);
       
-      // 5. Инициируем скачивание файла у пользователя в вебе
       final anchor = html.AnchorElement(href: url)
-        ..setAttribute('download', 'vienna_cleaning_report_nov_2026.pdf')
+        ..setAttribute('download', 'october_hours_report_smirnova.pdf')
         ..click();
       
       html.Url.revokeObjectUrl(url);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('PDF Report downloaded successfully!')),
+        const SnackBar(content: Text('October report downloaded!')),
       );
     } catch (e) {
       print('PDF Generation Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error generating report: $e')),
-      );
     } finally {
       setState(() => _isGenerating = false);
     }
