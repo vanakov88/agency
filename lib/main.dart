@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'vienna_schedule_screen.dart'; // Импорт первого экрана
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Supabase.initialize(
