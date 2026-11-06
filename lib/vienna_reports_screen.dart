@@ -68,13 +68,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   borderRadius: pw.BorderRadius.all(pw.Radius.circular(8)),
                 ),
                 child: pw.Column(
-                  cross pw.CrossAxisAlignment.start,
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
                     pw.Text('Employee: Anna Smirnova', style: pw.TextStyle(fontSize: 13, fontWeight: pw.FontWeight.bold)),
                     pw.Text('Role: Cleaning Specialist (Personal Contract)', style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey800)),
                     pw.SizedBox(height: 8),
                     pw.Row(
-                      main pw.MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
                         pw.Text('Total Planned Hours: ${totalPlannedHours.toStringAsFixed(2)} h', style: const pw.TextStyle(fontSize: 12)),
                         pw.Text('Total Actual Logged: ${totalActualHours.toStringAsFixed(2)} h', style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900)),
@@ -141,6 +141,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
       );
     } catch (e) {
       print('PDF Generation Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error generating report: $e')),
+      );
     } finally {
       setState(() => _isGenerating = false);
     }
