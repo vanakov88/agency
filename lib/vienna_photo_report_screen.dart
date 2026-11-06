@@ -292,11 +292,11 @@ class _PhotoReportScreenState extends State<PhotoReportScreen> {
             activeIcon: Icon(Icons.home),
             label: 'Home',
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.calendar_month_outlined),
-          //   activeIcon: Icon(Icons.calendar_month),
-          //   label: 'Schedule',
-          // ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_month_outlined),
+            activeIcon: Icon(Icons.calendar_month),
+            label: 'Schedule',
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat_bubble_outline),
             activeIcon: Icon(Icons.chat_bubble),
