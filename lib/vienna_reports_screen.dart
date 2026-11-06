@@ -39,7 +39,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           build: (pw.Context context) {
             return [
               // Шапка документа
-              pw.Text('CLEAN TEAM VIENNA — PERFORMANCE REPORT', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900)),
+              pw.Text('CLEAN TEAM VIENNA · PERFORMANCE REPORT', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900)),
               pw.SizedBox(height: 4),
               pw.Text('Monthly Summary Report · November 2026', style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700)),
               pw.SizedBox(height: 20),
@@ -80,17 +80,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 headerDecoration: const pw.BoxDecoration(color: PdfColors.blue900),
                 cellAlignment: pw.Alignment.centerLeft,
                 cellPadding: const pw.EdgeInsets.all(6),
-              ),
-              
-              pw.SizedBox(height: 30),
-              pw.Divider(thickness: 0.5, color: PdfColors.grey400),
-              pw.SizedBox(height: 10),
-              pw.Align(
-                alignment: pw.Alignment.centerRight,
-                child: pw.Text(
-                  'Report generated automatically on system client side. AI responses may include mistakes.',
-                  style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
-                ),
               ),
             ];
           },
