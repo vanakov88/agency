@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'vienna_schedule_screen.dart';
+import 'vienna_chat_screen.dart';
+import 'dart:html' as html; // Используется для скачивания файлов во Flutter Web
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -10,7 +14,113 @@ class ReportsScreen extends StatefulWidget {
 }
 
 class _ReportsScreenState extends State<ReportsScreen> {
-  int _currentIndex = 3; // Индекс вкладки "Отчёты"
+  int _currentIndex = 3;
+  bool _isGenerating = false;
+
+  // Функция генерации и скачивания PDF на основе живых данных из Supabase
+  Future<void> _generateAndDownloadPDF() async {
+    setState(() => _isGenerating = true);
+
+    try {
+      // 1. Запрашиваем данные из живой базы PostgreSQL (Линейный срез за Ноябрь 2026)
+      final List<dynamic> tasks = await Supabase.instance.client
+          .from('cleaningtasks')
+          .select('status, scheduled_start, scheduled_duration, actual_start, actual_end, apartments(address, district)')
+          .order('scheduled_start', ascending: true);
+
+      // 2. Создаем виртуальный PDF документ
+      final pdf = pw.Document();
+
+      // 3. Формируем страницу отчета
+      pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4,
+          margin: const pw.EdgeInsets.all(32),
+          build: (pw.Context context) {
+            return [
+              // Шапка документа
+              pw.Text('CLEAN TEAM VIENNA — PERFORMANCE REPORT', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue900)),
+              pw.SizedBox(height: 4),
+              pw.Text('Monthly Summary Report · November 2026', style: const pw.TextStyle(fontSize: 12, color: PdfColors.grey700)),
+              pw.SizedBox(height: 20),
+
+              // Заголовок таблицы
+              pw.Text('Detailed Cleaning Log', style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 8),
+
+              // Строим таблицу данных
+              pw.TableHelper.fromTextArray(
+                headers: ['Date', 'District / Address', 'Plan (h)', 'Actual (h)', 'Status'],
+                data: tasks.map((task) {
+                  final apt = task['apartments'] as Map<String, dynamic>? ?? {};
+                  final startStr = task['scheduled_start']?.toString().split('T').first ?? '';
+                  
+                  // Расчет плановых часов
+                  final int planMin = task['scheduled_duration'] ?? 0;
+                  final double planHours = planMin / 60.0;
+
+                  // Расчет фактических отработанных часов
+                  double actualHours = 0.0;
+                  if (task['actual_start'] != null && task['actual_end'] != null) {
+                    final start = DateTime.parse(task['actual_start']);
+                    final end = DateTime.parse(task['actual_end']);
+                    actualHours = end.difference(start).inMinutes / 60.0;
+                  }
+
+                  return [
+                    startStr,
+                    '${apt['district'] ?? ''}\n${apt['address'] ?? ''}',
+                    planHours.toStringAsFixed(2),
+                    actualHours > 0 ? actualHours.toStringAsFixed(2) : '-',
+                    task['status']?.toString().toUpperCase() ?? '',
+                  ];
+                }).toList(),
+                border: pw.TableBorder.all(color: PdfColors.grey400, width: 0.5),
+                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+                headerDecoration: const pw.BoxDecoration(color: PdfColors.blue900),
+                cellAlignment: pw.Alignment.centerLeft,
+                cellPadding: const pw.EdgeInsets.all(6),
+              ),
+              
+              pw.SizedBox(height: 30),
+              pw.Divider(thickness: 0.5, color: PdfColors.grey400),
+              pw.SizedBox(height: 10),
+              pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Text(
+                  'Report generated automatically on system client side. AI responses may include mistakes.',
+                  style: const pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+                ),
+              ),
+            ];
+          },
+        ),
+      );
+
+      // 4. Конвертируем документ в байты для сохранения в браузере
+      final bytes = await pdf.save();
+      final blob = html.Blob([bytes], 'application/pdf');
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      
+      // 5. Инициируем скачивание файла у пользователя в вебе
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute('download', 'vienna_cleaning_report_nov_2026.pdf')
+        ..click();
+      
+      html.Url.revokeObjectUrl(url);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('PDF Report downloaded successfully!')),
+      );
+    } catch (e) {
+      print('PDF Generation Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error generating report: $e')),
+      );
+    } finally {
+      setState(() => _isGenerating = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +129,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
-          'Reports',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
+        title: const Text('Reports', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 20)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -34,407 +137,74 @@ class _ReportsScreenState extends State<ReportsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Schedule, completed cleanings and photo logs',
-                style: TextStyle(color: Colors.grey, fontSize: 14),
-              ),
-              const SizedBox(height: 16),
+              const Text('Schedule, completed cleanings and live PDF export', style: TextStyle(color: Colors.grey, fontSize: 14)),
+              const SizedBox(height: 24),
 
-              // Переключатель: Дневной / Месячный
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.all(4),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'Daily',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: const Center(
-                          child: Text(
-                            'Monthly',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Поля фильтров (Дата, Сотрудник, Группа)
-              _buildFilterField(
-                'Date',
-                'November 2, 2026, Monday',
-                trailingIcon: Icons.calendar_today_outlined,
-              ),
-              _buildFilterField(
-                'Employee name',
-                'Anna Smirnova',
-                trailingIcon: Icons.keyboard_arrow_down,
-              ),
-              _buildFilterField(
-                'Apartment group',
-                'All groups',
-                trailingIcon: Icons.keyboard_arrow_down,
-              ),
-              const SizedBox(height: 16),
-
-              // Кнопка генерации Excel
+              // Кнопка экспорта в PDF
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0D47A1),
                   foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  minimumSize: const Size(double.infinity, 52),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   elevation: 0,
                 ),
-                onPressed: () {},
-                icon: const Icon(Icons.table_view_outlined),
-                label: const Text(
-                  'Generate Excel Report',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                ),
+                onPressed: _isGenerating ? null : _generateAndDownloadPDF,
+                icon: _isGenerating 
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : const Icon(Icons.picture_as_pdf_outlined),
+                label: Text(_isGenerating ? 'Generating PDF...' : 'Download PDF Report', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
               ),
               const SizedBox(height: 24),
 
-              // Итоги дня
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'Day results',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'As of 12:30 PM · Nov 2',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                ],
-              ),
+              const Text('Day results', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-
               Row(
                 children: [
-                  Expanded(
-                    child: _buildSummaryCard(
-                      title: 'Scheduled',
-                      count: '3 cleanings',
-                      sub: '6 hours assigned',
-                      color: const Color(0xFFF8F9FA),
-                      textColor: Colors.black87,
-                    ),
-                  ),
+                  Expanded(child: _buildSummaryCard('Scheduled', '3 cleanings', '6 hours assigned', const Color(0xFFF8F9FA), Colors.black87)),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildSummaryCard(
-                      title: 'Completed',
-                      count: '1 cleaning',
-                      sub: '2 hours logged',
-                      color: const Color(0xFFEEF2FA),
-                      textColor: const Color(0xFF0D47A1),
-                    ),
-                  ),
+                  Expanded(child: _buildSummaryCard('Completed', '1 cleaning', '2 hours logged', const Color(0xFFEEF2FA), const Color(0xFF0D47A1))),
                 ],
-              ),
-              const SizedBox(height: 12),
-
-              // Строка статусов текстом
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'In progress: 1',
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
-                  Text(
-                    'Planned: 1',
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
-                  Text(
-                    'Photo logs: 1',
-                    style: TextStyle(
-                      color: Color(0xFF0D47A1),
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Раздел Квартиры
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'Apartments',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'Anna Smirnova',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Список карточек квартир для отчёта
-              _buildReportApartmentCard(
-                time: 'District: Zentrum · 09:00–11:00',
-                address: 'Mariahilfer Str. 45, Apt. 12',
-                statusLabel: 'Completed',
-                additionalInfo: 'Logged: 2 h',
-                statusColor: Colors.grey,
-                showPhotoLog: true,
-              ),
-              _buildReportApartmentCard(
-                time: 'District: Zentrum · 11:30–13:30',
-                address: 'Praterstraße 23, Apt. 8',
-                statusLabel: 'In progress',
-                additionalInfo: 'Elapsed: 1 h · Plan: 2 h',
-                statusColor: const Color(0xFF0D47A1),
-                showPhotoLog: false,
-              ),
-              _buildReportApartmentCard(
-                time: 'District: Nord · 14:00–16:00',
-                address: 'Schönbrunner Str. 112, Apt. 4',
-                statusLabel: 'Scheduled',
-                additionalInfo: 'Plan: 2 h',
-                statusColor: Colors.grey,
-                showPhotoLog: false,
               ),
             ],
           ),
         ),
       ),
-
-      // Навигационная панель
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() => _currentIndex = index);
           if (index == 0 || index == 1) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CleaningScheduleScreen(),
-              ),
-            );
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const CleaningScheduleScreen()));
+          } else if (index == 2) {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ChatScreen()));
           }
         },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF0D47A1),
         unselectedItemColor: Colors.grey,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month_outlined),
-            activeIcon: Icon(Icons.calendar_month),
-            label: 'Schedule',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            activeIcon: Icon(Icons.chat_bubble),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            activeIcon: Icon(Icons.bar_chart),
-            label: 'Reports',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_month_outlined), label: 'Schedule'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: 'Chat'),
+          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Reports'),
         ],
       ),
     );
   }
 
-  // Виджет для полей фильтрации
-  Widget _buildFilterField(
-    String label,
-    String value, {
-    required IconData trailingIcon,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-          const SizedBox(height: 4),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.withOpacity(0.2)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  value,
-                  style: const TextStyle(fontSize: 14, color: Colors.black87),
-                ),
-                Icon(trailingIcon, color: Colors.grey, size: 18),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Виджет карточки итогов (виджеты сверху)
-  Widget _buildSummaryCard({
-    required String title,
-    required String count,
-    required String sub,
-    required Color color,
-    required Color textColor,
-  }) {
+  Widget _buildSummaryCard(String title, String count, String sub, Color color, Color textColor) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          Text(title, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w500)),
           const SizedBox(height: 8),
-          Text(
-            count,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
+          Text(count, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
           Text(sub, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-        ],
-      ),
-    );
-  }
-
-  // Исправленный метод для построения карточек квартир
-  Widget _buildReportApartmentCard({
-    required String time,
-    required String address,
-    required String statusLabel,
-    required String additionalInfo,
-    required Color statusColor,
-    required bool showPhotoLog,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  address,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  statusLabel,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(time, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                additionalInfo,
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-              if (showPhotoLog)
-                TextButton.icon(
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    foregroundColor: const Color(0xFF0D47A1),
-                  ),
-                  onPressed: () {},
-                  icon: const Icon(Icons.image_outlined, size: 14),
-                  label: const Text(
-                    'Photo log >',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                  ),
-                ),
-            ],
-          ),
         ],
       ),
     );
