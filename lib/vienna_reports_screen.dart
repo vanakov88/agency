@@ -259,16 +259,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
             activeIcon: Icon(Icons.home),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month_outlined),
-            activeIcon: Icon(Icons.calendar_month),
-            label: 'Schedule',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            activeIcon: Icon(Icons.chat_bubble),
-            label: 'Chat',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.calendar_month_outlined),
+          //   activeIcon: Icon(Icons.calendar_month),
+          //   label: 'Schedule',
+          // ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.chat_bubble_outline),
+          //   activeIcon: Icon(Icons.chat_bubble),
+          //   label: 'Chat',
+          // ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bar_chart),
             activeIcon: Icon(Icons.bar_chart),
