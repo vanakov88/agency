@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'vienna_schedule_screen.dart'; // Импорт первого экрана
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://zrbukqvrubynlxfeoise.supabase.co',
+    anonKey: 'sb_publishable__JyrFRB0yBMQmT1BTNxTjw_S_El0Dg8',
+  );
+  
   runApp(const MyApp());
 }
 

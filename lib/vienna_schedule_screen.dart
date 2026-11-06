@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'vienna_task_detail.dart';
 import 'vienna_reports_screen.dart';
 import 'vienna_chat_screen.dart';
@@ -34,6 +35,34 @@ class CleaningScheduleScreen extends StatefulWidget {
 
 class _CleaningScheduleScreenState extends State<CleaningScheduleScreen> {
   int _currentIndex = 0;
+
+  @override
+  void tribesInitState() { // Для работы во Flutter метод называется initState
+    super.initState();
+    // Вызываем чтение базы данных сразу при загрузке экрана
+    _fetchDataFromSupabase();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDataFromSupabase();
+  }
+
+  // Метод для отправки запроса в Postgres и вывода логов в консоль F12
+  void _fetchDataFromSupabase() async {
+    try {
+      final data = await Supabase.instance.client
+          .from('cleaningtasks')
+          .select('id, status, scheduled_start, apartments(address, district)');
+      
+      print('🚀 --- SUPABASE LIVE DATA ON LAUNCH ---');
+      print(data);
+      print('---------------------------------------');
+    } catch (error) {
+      print('❌ --- SUPABASE ERROR ON LAUNCH: $error ---');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
